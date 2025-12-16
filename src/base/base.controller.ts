@@ -26,101 +26,48 @@ export abstract class BaseController<
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() body: CreateDto) {
-    try {
-      if (!body || Object.keys(body).length === 0) {
-        throw new BadRequestException('Request body cannot be empty');
-      }
-      const data = await this.service.create(body);
-      return {
-        message: `${this.service.entityName} created successfully`,
-        data,
-      };
-    } catch (error) {
-      console.error(`Error creating ${this.service.entityName}:`, error);
-      throw new InternalServerErrorException(
-        `Failed to create ${this.service.entityName}`,
-      );
+    if (!body || Object.keys(body).length === 0) {
+      throw new BadRequestException('Request body cannot be empty');
     }
+
+    const data = await this.service.create(body);
+
+    return data;
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
   async findAll(@Query() query: QueryOptions<T>) {
-    try {
-      const result = await this.service.findAllAdvanced(query);
-      return {
-        message: `${this.service.entityName}s fetched successfully`,
-        ...result,
-      };
-    } catch (error) {
-      console.error(`Error fetching ${this.service.entityName}s:`, error);
-      throw new InternalServerErrorException(
-        `Failed to fetch ${this.service.entityName}s`,
-      );
-    }
+    const result = await this.service.findAllAdvanced(query);
+
+    return result;
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async findOne(@Param('id') id: number) {
-    try {
-      const data = await this.service.findOne(Number(id));
-      if (!data)
-        throw new NotFoundException(
-          `${this.service.entityName} with ID ${id} not found`,
-        );
-      return {
-        message: `${this.service.entityName} fetched successfully`,
-        data,
-      };
-    } catch (error) {
-      console.error(
-        `Error fetching ${this.service.entityName} with ID ${id}:`,
-        error,
-      );
-      throw new InternalServerErrorException(
-        `Failed to fetch ${this.service.entityName}`,
-      );
-    }
+    const data = await this.service.findOne(Number(id));
+
+   return data;
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async update(@Param('id') id: number, @Body() body: UpdateDto) {
-    try {
-      if (!body || Object.keys(body).length === 0) {
-        throw new BadRequestException('Update payload cannot be empty');
-      }
-      const data = await this.service.update(Number(id), body);
-      return {
-        message: `${this.service.entityName} updated successfully`,
-        data,
-      };
-    } catch (error) {
-      console.error(
-        `Error updating ${this.service.entityName} with ID ${id}:`,
-        error,
-      );
-      throw new InternalServerErrorException(
-        `Failed to update ${this.service.entityName}`,
-      );
+    if (!body || Object.keys(body).length === 0) {
+      throw new BadRequestException('Update payload cannot be empty');
     }
+
+    const data = await this.service.update(Number(id), body);
+
+    return data;
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async remove(@Param('id') id: number) {
-    try {
-      const result = await this.service.remove(Number(id));
-      return { message: result.message };
-    } catch (error) {
-      console.error(
-        `Error deleting ${this.service.entityName} with ID ${id}:`,
-        error,
-      );
-      throw new InternalServerErrorException(
-        `Failed to delete ${this.service.entityName}`,
-      );
-    }
+    const result = await this.service.remove(Number(id));
+
+    return result;
   }
 }
